@@ -1,6 +1,15 @@
 
 const GeoRequest = (url, callback) => {
-  fetch(url)
+  let options = {
+    method: 'GET',
+    // headers: {
+    //   'Accept': 'application/json, text/plain, */*',
+    //   'Content-Type': 'application/json'
+    // },
+    // mode: 'cors',
+    // cache: 'default' 
+  };
+  fetch(url, options)
     .then(
       function(response) {
         if(response.status !== 200){

@@ -11,7 +11,7 @@ const Main = () => {
     <main className={styles.main}>
       <Switch>
         <Route exact path='/' component={Home}/>
-        <Route exact path='/today/' component={Today}/>
+        <Route exact path='/today' component={Today}/>
         {/* <Route exact path='/' render={(props) => (
           <Home {...props} data={"123"} />
         )}/> */}

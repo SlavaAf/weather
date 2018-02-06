@@ -36,11 +36,6 @@
   line-height: 1;
   margin-bottom: 15px;
 }
-.city__temp::after{
-  content: "°C";
-  margin-left: 1px;
-  display: inline-block;
-}
 .city__name{
   font-size: 1em;
   line-height: 1;

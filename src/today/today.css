@@ -36,11 +36,6 @@
   line-height: 1;
   margin-bottom: 15px;
 }
-.city__temp::after{
-  content: "°C";
-  margin-left: 1px;
-  display: inline-block;
-}
 .city__name{
   font-size: 1em;
   line-height: 1;
@@ -61,6 +56,12 @@
   padding: 25px 0;
   margin: 0 auto;
   width: 90%;
+  display: flex;
+}
+.more__map{
+  width: 60%;
+  position: relative;
+  padding-left: 15px;
 }
 .more__data{
   width: 40%;
@@ -95,4 +96,31 @@
 }
 .table__tbody td:first-child{
   padding-right: 15px;
+}
+.map__marker{
+  background-color: red;
+  display: block;
+  border-radius: 50%;
+  overflow: hidden;
+  width: 30px;
+  height: 30px;
+}
+.map__marker.map__marker_hidden > span{
+  display: none;
+}
+.map__marker span{
+  position: absolute;
+  display: block;
+  width: 100px;
+  height: 80px;
+  top: -90px;
+  left: -35px;
+  padding: 5px;
+  text-align: center;
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+}
+.map__marker:hover{
+  color: red;
 }
