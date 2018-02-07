@@ -56,6 +56,7 @@
   padding: 25px 0;
   margin: 0 auto;
   width: 90%;
+  min-height: 400px;
   display: flex;
 }
 .more__map{
@@ -110,13 +111,18 @@
 }
 .map__marker span{
   position: absolute;
-  display: block;
+  /* display: block; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100px;
   height: 80px;
   top: -90px;
   left: -35px;
   padding: 5px;
   text-align: center;
+  font-weight: 500;
+  font-size: 1.5em;
   background-color: #fff;
   color: #000;
   border: 1px solid #000;

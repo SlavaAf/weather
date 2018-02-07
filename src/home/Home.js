@@ -4,7 +4,7 @@ import GetDataWeather, { GetDataGeoLocation } from '../page/GetData';
 
 
 
-class TopBar extends Component {
+export class TopBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -12,10 +12,13 @@ class TopBar extends Component {
       city: "",
       weather: "",
       isLoading: true,
+      otherPage: false,
     };
   }
-
   componentWillMount() {
+    this.setState({
+      otherPage: this.props.otherPage,
+    })
     GetDataGeoLocation(coord => {
       GetDataWeather(coord, list => {
         this.setState({
@@ -23,28 +26,34 @@ class TopBar extends Component {
           temp: list.temp,
           city: list.city + ", " + list.country,
           weather: list.weather + ", " + list.wind
-          })
+        })
       })
     })
   }
-
   render() {
-    const { temp, city, weather, isLoading } = this.state;
+    const { temp, city, weather, isLoading, otherPage } = this.state;
 
-    if(isLoading) {
+    if( isLoading ){
       return (
         <h2 className={styles.city__temp}>Loading...</h2>
       )
     };
-
-    if(!isLoading) {
-      return [
-        <button key="city_save_btn" type="button" className={styles.city__add}>+</button>,
-        <h2 key="city_head_temp" className={styles.city__temp}>{temp}</h2>,
-        <h1 key="city_head_name" className={styles.city__name}>{city}</h1>,
-        <h3 key="city_head_weather" className={styles.city__weather}>{weather}</h3>
-      ]
-    }
+    if( !isLoading ){
+      if( otherPage ){
+        return [
+          <button key="city_save_btn" type="button" className={styles.city__add}>+</button>,
+          <h2 key="city_head_temp" className={styles.city__temp}>{temp}</h2>,
+          <h1 key="city_head_name" className={styles.city__name}>{city}</h1>
+        ]
+      }else{
+        return [
+          <button key="city_save_btn" type="button" className={styles.city__add}>+</button>,
+          <h2 key="city_head_temp" className={styles.city__temp}>{temp}</h2>,
+          <h1 key="city_head_name" className={styles.city__name}>{city}</h1>,
+          <h3 key="city_head_weather" className={styles.city__weather}>{weather}</h3>
+        ]
+      }
+    };
   }
 }
 
@@ -55,7 +64,6 @@ class Home extends Component {
       <div>
         <section className={styles.city}>
             <TopBar />
-            {/* <withFetching App /> */}
         </section>
         <section className={styles.saveds}>
           <h1 className={styles.saveds__heading}>Saved cities</h1>

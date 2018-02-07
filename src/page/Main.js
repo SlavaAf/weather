@@ -1,7 +1,6 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import styles from './page.css';
-// import ttt from './fetch'
 
 import Home from '../home/Home';
 import Today from '../today/Today';

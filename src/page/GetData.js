@@ -1,10 +1,9 @@
 
 import FetchCall from './Fetch';
 
-// Geolocation
+
 export const GetDataGeoLocation = (callback) => {
   let coord = [];
-
   if(sessionStorage.coord !== undefined){
     console.log("load sessionStorage");
     coord = JSON.parse(sessionStorage.coord);
@@ -13,7 +12,6 @@ export const GetDataGeoLocation = (callback) => {
     console.log("load no session");
     FetchCall("//ipapi.co/json", data => {
       coord = [data.latitude, data.longitude];
-
       if(data.country === "RU"){
         sessionStorage.setItem("coord",JSON.stringify(coord));
         return callback(coord);
@@ -41,16 +39,91 @@ export const GetDataGeoLocation = (callback) => {
   }
 }
 
+const Timestamp = (timestamp, callback) => {
+  let update = false,
+      stamp = false;
+  if(sessionStorage.getItem(timestamp) !== null){
+    stamp = true;
+    console.log("timestamp - " + stamp);
+    let time    = sessionStorage.getItem(timestamp),
+        newtime = new Date().toTimeString().split(" ")[0],
+        minutes = 0,
+        min_up  = 10;
+    newtime = newtime.split(':')[0] * 60 + newtime.split(':')[1] * 1;
+    minutes = newtime - time;
+    if(minutes >= min_up){
+      update = true;
+      console.log("update - " + update);
+      sessionStorage.setItem(timestamp, newtime);
+      return callback(stamp, update)
+    }else{
+      update = false;
+      console.log("update - " + update);
+      return callback(stamp, update)
+    }
+  }else{
+    stamp = false;
+    console.log("timestamp - " + stamp);
+    let time = new Date().toTimeString().split(" ")[0];
+    time = time.split(':')[0] * 60 + time.split(':')[1] * 1;
+    sessionStorage.setItem(timestamp, time);
+    return callback(stamp, update)
+  }
+}
 
 
-export const GetDataForecast = (lat, lon, item, callback) => {
-  // let apikey = "4882bb2318db9a69e681e20cc403b2ac";
-  console.log("forecast")
+export const GetDataForecast = (coord, type, callback) => {
+  const GetForecast = (coord, type) => {
+    let apikey = "4882bb2318db9a69e681e20cc403b2ac",
+        url    = "//api.openweathermap.org/data/2.5/forecast?",
+        units  = "units=metric";
+    FetchCall(url + "lat=" + coord[0] + "&lon=" + coord[1] + "&appid=" + apikey + "&" + units, (data) => {
+      let list = {},
+          arrl = [];
+      if(type === "today"){
+        let date  = new Date(data.list[0].dt_txt.split(" ")),
+            month = date.toLocaleString('en-US',{month: 'long'}),
+            day   = date.getDate(),
+            data_list = data.list;
+        for(let i=0; i<4; i++){
+          let wind = Math.round(data_list[i].wind.speed),
+              new_time = (new Date(data_list[i].dt_txt)).getHours() + ":00",
+              weather = Math.round(data_list[i].main.temp) + "°C, " + data_list[i].weather[0].description,
+              code = {};
+          if(wind < 1){
+            wind = ", No wind";
+          }else{
+            wind = ", Wind - " + wind + " meter per second";
+          }
+          code.time = new_time;
+          code.weather = weather + wind;
+          arrl[i] = code;
+        };
+        list.date = month + ", " + day;
+        list.data = arrl;
+        sessionStorage.setItem("list_" + type, JSON.stringify(list))
+        return callback(list, arrl)
+      }
+      if( type === "tomorrow"){}
+      if( type === "week"){}
+    });
+  };
+  Timestamp("timestamp_" + type, (stamp, update) => {
+    if(stamp){
+      if(update){
+        GetForecast(coord, type)
+      }else{
+        let list = JSON.parse(sessionStorage.getItem("list_" + type));
+        return callback(list);
+      }
+    }else{
+      GetForecast(coord, type)
+    }
+  })
 }
 
 
 const GetDataWeather = (coord, callback) => {
-  // -----
   const GetWeather = (coord) => {
     let apikey = "4882bb2318db9a69e681e20cc403b2ac",
         url    = "//api.openweathermap.org/data/2.5/weather?",
@@ -61,43 +134,28 @@ const GetDataWeather = (coord, callback) => {
       list.temp    = data.main.temp + "°C";
       list.country = data.sys.country;
       list.weather = data.weather[0].description;
-
       if(1 >= data.wind.speed){
         list.wind = "No wind";
       }else{
         list.wind  = "Wind - " + data.wind.speed + " meter per second";
       }
-
       sessionStorage.setItem("list",JSON.stringify(list));
-
       return callback(list)
     })
   }
-  if(sessionStorage.timestamp !== undefined){
-    console.log("timestamp");
-    let time    = sessionStorage.timestamp,
-        newtime = new Date().toTimeString().split(" ")[0],
-        minutes = 0,
-        min_up  = 10;
-
-    newtime = newtime.split(':')[0] * 60 + newtime.split(':')[1] * 1;
-    minutes = newtime - time;
-
-    if(minutes >= min_up){
-      console.log("update");
-      sessionStorage.setItem("timestamp", newtime);
-      GetWeather(coord);
+  Timestamp("timestamp", (stamp, update) => {
+    if(stamp){
+      if(update){
+        GetWeather(coord);
+      }else{
+        let list = JSON.parse(sessionStorage.list);
+        return callback(list);
+      }
     }else{
-      console.log("not update");
-      let list = JSON.parse(sessionStorage.list);
-      return callback(list);
+      GetWeather(coord);
     }
-  }else{
-    console.log("no timestamp");
-    let time = new Date().toTimeString().split(" ")[0];
-    sessionStorage.setItem("timestamp", time);
-    GetWeather(coord);
-  }
+  })
 }
+
 
 export default GetDataWeather;
